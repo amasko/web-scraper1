@@ -16,7 +16,7 @@ public class PageProcessor {
         out1 = new File("outputtemp.txt");
         if (!out.exists()) {
             try {
-                out.createNewFile();
+                boolean c = out.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -28,7 +28,7 @@ public class PageProcessor {
         BufferedWriter writer = null;
         BufferedWriter writer1 = null;
         String result = "";
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         try {
             /*URLConnection con = url.openConnection();
             InputStream is =con.getInputStream();*/
@@ -45,7 +45,7 @@ public class PageProcessor {
                 //replacing markup from page and writing it to the output
             }
             result = sb.toString()
-                    .replaceAll("(<script).*?(/script>)|(<style).*?(/style>)|<.*?>|&\\S*?;", "");
+                    .replaceAll("(<script).*?(</script>)|(<style).*?(/style>)|<.*?>|&\\S*?;", "");
 
             long t11 = System.nanoTime();
             long s1 = TimeUnit.NANOSECONDS.toMillis(t11 - t00);
@@ -57,29 +57,33 @@ public class PageProcessor {
             // "&end;; adding in case of multiple white space occurrence
 
             long t0 = System.nanoTime();
-
-            writer.write(result.replaceAll("\\s{2,}", "&end;; "));
+            String result1 = result.replaceAll("\\s{2,}|\\t|\\.\\s", "&end;; ");
+            writer.write(result1);
             long t1 = System.nanoTime();
             long s = TimeUnit.NANOSECONDS.toMillis(t1 - t0);
             System.out.println("time removing: " + s);
 
             //temporary
 
-            DataProcessor dp = new DataProcessor(result);
-            System.out.println("words count: " + dp.charactersNumber(result));
+            DataProcessor dp = new DataProcessor(result1);
+            System.out.println("chars count: " + dp.charactersNumber(result));
 //            Map<String, Integer> stringIntegerHashMap = dp.wordsNumber(result);
 //            for (String st : stringIntegerHashMap.keySet()) {
 //                writer1.write(st + "--> " + stringIntegerHashMap.get(st));
 //                writer1.newLine();
 //            }
-            Integer tempp = dp.wordsNumber("gaza".toLowerCase());
+            Integer tempp = dp.wordsNumber("job".toLowerCase());
             if (tempp != null) {
-                System.out.println("words Russia: " + tempp);
-
+                System.out.println("words job: " + tempp);
             } else {
                 System.out.println("there's no such a word");
             }
+            if (tempp != null) {
+                dp.extractSentence("Job".toLowerCase());
+            } else {
+                System.out.println("there's no such a word");
 
+            }
             in.close();
             writer.close();
             writer1.close();
