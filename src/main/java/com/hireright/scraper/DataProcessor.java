@@ -75,8 +75,8 @@ public class DataProcessor {
         //this will check if a word is not the part of another word
         String patternStr = ".*?\\b" + str + "\\b.*?";
         Pattern pattern;
-        //choose sentences containing given words
         List<String> required = new ArrayList<String>();
+        //choose sentences containing given words
         for (String s : sentences) {
             pattern = Pattern.compile(patternStr, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(s);
