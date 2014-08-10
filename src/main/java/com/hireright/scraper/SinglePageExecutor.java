@@ -1,91 +1,69 @@
 package main.java.com.hireright.scraper;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SinglePageExecutor implements Runnable {
 
+    private String addr;
+    private String[] wordArray;
     private boolean v = false, w = false, c = false, e = false;
-    private String[] args;
 
-    public SinglePageExecutor(String[] args) {
-        this.args = args;
+    public SinglePageExecutor(String addr, String[] wodrArray, boolean v, boolean w, boolean c, boolean e) {
+        this.addr = addr;
+        this.wordArray = wodrArray;
+        this.v = v;
+        this.w = w;
+        this.c = c;
+        this.e = e;
     }
 
     @Override
     public void run() {
-        String addr = args[0];
-//        Pattern pattern = Pattern.compile(patternStr, Pattern.CASE_INSENSITIVE);
-//        Matcher matcher = pattern.matcher(s);
-        String currentDirTxt = "\\S*\\.txt$";
-        String words = args[1];
-        String[] wordArray = words.split(",");
-        for (int i = 2; i < args.length; i++) {
-            setFlags(args[i]);
-        }
-
+        List<String> data = new ArrayList<String>();
         PageProcessor pp = new PageProcessor();
         //Raw page content
         String pageContent = pp.processPage(addr);
         long t0 = System.currentTimeMillis();
         DataProcessor dp = new DataProcessor(pageContent);
-        if (c)
-            printMessage("Number of characters on the page", String.valueOf(dp.charactersNumber()));
+        data.add("\nFor web page " + addr + ":\n");
+        if (c) {
+            data.add("Number of characters on the page: " + dp.charactersNumber());
+            data.add("******************************************\n");
+        }
         if (w) {
             for (String word : wordArray) {
                 Integer number = dp.wordsNumber(word.toLowerCase());
                 if (number != null)
-                    printMessage("word \"" + word + "\" is found ", number + " times");
+                    data.add("word \"" + word + "\" is found " + number + " times;\n");
                  else
-                    printMessage("word \"" + word + "\" is not found on the page", "");
+                    data.add("word \"" + word + "\" is not found on the page;\n");
             }
+            data.add("******************************************\n");
         }
         if (e) {
-            dp.loadToFile();
+            //temp
+//            dp.loadToFile();
             dp.extractAllSentences();
             for (String word : wordArray) {
                 if (dp.getFreq().get(word.toLowerCase()) != null) {
+                    data.add("sentences for \"" + word + "\":");
                     for (String sentence : dp.extractSentence(word.toLowerCase())) {
-                        System.out.println(sentence);
+                        data.add(sentence);
                     }
-                    System.out.println("         ***");
+                    data.add("         ***\n");
                 }
             }
-            System.out.println("===================================================");
+            data.add("******************************************");
         }
-
         if (v) {
             long t1 = System.currentTimeMillis();
             long processTime = t1 - t0;
-            System.out.println("Scraping time: " + pp.getScrapTime() + " ms.");
-            System.out.println("Data processing time: " + processTime + " ms.");
-            System.out.println("===================================================");
+            data.add("Scraping time: " + pp.getScrapTime() + " ms.; \n" +
+                    "Data processing time: " + processTime + " ms.;\n");
+            data.add("******************************************");
         }
+        data.add("******************************************");
+        InfoKeeper.INSTANCE.storeAll(data);
     }
-
-    public void printMessage(String title, String msg) {
-        System.out.println(title +": "+msg);
-//        System.out.println(msg);
-        System.out.println("\n\r*******************************************************\n\r");
-
-    }
-
-    public void setFlags(String flag) {
-        if (flag.equals("-v")) {
-            v = true;
-
-        } else if (flag.equals("-w")) {
-            w = true;
-
-        } else if (flag.equals("-c")) {
-            c = true;
-
-        } else if (flag.equals("-e")) {
-            e = true;
-
-        } else {
-            printMessage("Error: ", "incompatible input; check your flags ");
-        }
-    }
-
 }

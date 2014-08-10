@@ -3,9 +3,6 @@ package main.java.com.hireright.scraper;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class PageProcessor {
@@ -35,6 +32,7 @@ public class PageProcessor {
             in.close();
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            InfoKeeper.INSTANCE.printError("Problem occured while trying to eccess page: " + urlStr);
         } catch (IOException e) {
             e.printStackTrace();
         }

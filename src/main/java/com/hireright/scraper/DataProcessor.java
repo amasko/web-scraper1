@@ -56,21 +56,6 @@ public class DataProcessor {
         }
     }
 
-    public void loadToFile() {
-        File out = new File("output.txt");
-//        out.createNewFile()
-        try {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(out, false)));//, "UTF-8"
-            writer.write(string);
-            writer.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public List<String> extractSentence(String str) {
         //this will check if a word is not the part of another word
         String patternStr = ".*?\\b" + str + "\\b.*?";
